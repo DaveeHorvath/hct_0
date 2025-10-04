@@ -3,6 +3,22 @@
 #include <sys/types.h>
 #include <sys/epoll.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <regex.h>
+#include <string.h>
+
+#define COLORRED 100
+#define COLORGREEN 200
+
+void changeColorRed()
+{
+    printf("red\n");
+}
+
+void changeColorGreen()
+{
+    printf("green\n");
+}
 
 int main(void)
 {
@@ -34,7 +50,6 @@ int main(void)
     {
         printf("#### Started ir process with pid %d\n", ir);
         dup2(1, ircPipe[0]);
-        
         system("bash -c 'mode2 -d /dev/lirc1 | grep pulse'");
     }
     // start the python project and use it at a second filedescriptor
@@ -67,6 +82,12 @@ int main(void)
 
     // epoll the fds:
         // upon input change the state: authenticated, connected to fd
+    //ssize_t getline(char **restrict lineptr, size_t *restrict n,
+    //   FILE *restrict stream);
+    bool authorized = false;
+    char *buffer = (char*)calloc(512, sizeof(char));
+    size_t bufferSize = 512;
+
     while (1)
     {
         eventAmount = epoll_wait(polled, events, EPOLL_SIZE, 0); 
@@ -77,20 +98,49 @@ int main(void)
         for (int i = 0; i < eventAmount; i++)
         {
             // ir execution
-            if (events[i].data.fd == ircPipe[1])
+            if (events[i].data.fd == ircPipe[1] && authorized)
             {
-
+                fgets(buffer, bufferSize, &ircPipe[1]);
+                int code = 0;
+                for (int c = 0; buffer[c]; c++)
+                {
+                    if (isdigit(buffer[c]))
+                    {
+                        code = atoi(&buffer[c]);
+                    }
+                }
+                switch (code)
+                {
+                case COLORRED:
+                    changeColorRed();
+                    break;
+                case COLORGREEN:
+                    changeColorGreen();
+                    break;
+                
+                default:
+                    break;
+                }
             }
             // opencv execution
             if (events[i].data.fd == authPipe[1])
             {
-
+                fgets(buffer, bufferSize, &authPipe[1]);
+                if (strncmp(buffer, "true", 4))
+                    authorized = true;
+                if (strncmp(buffer, "false", 5))
+                    authorized = false;
             }
             // webserv execution
             if (events[i].data.fd == extPipe[1])
             {
-
+                fgets(buffer, bufferSize, &extPipe[1]);
+                if (strncmp(buffer, "red", 3))
+                    changeColorRed();
+                if (strncmp(buffer, "green", 5))
+                    changeColorGreen();
             }
         }
     }
 }
+
