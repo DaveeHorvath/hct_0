@@ -1,6 +1,9 @@
 # hct_0
 # demo
 https://www.youtube.com/watch?v=WWoAARBiZ34
+We built a failsafe for autonomous robots that give back control to the soldiers on the ground even when everything goes to shit. We added a multifactor method for authenticating, so enemy troops wont be able to stop our machines with the same methods.
+The demo can be found on github with an original and an improved version of the sourcecode.
+The video is attached to the github as well
 # references
 detection code from: https://github.com/Deepanker5/junction/blob/main/detector.py 
 ## usage:
