@@ -1,4 +1,7 @@
 # hct_0
+# demo
+https://www.youtube.com/watch?v=WWoAARBiZ34
+# references
 detection code from: https://github.com/Deepanker5/junction/blob/main/detector.py 
 ## usage:
 this solution is tested only on our system, as an external IR receiver has to be connected to the raspberry pi as well. a quick demo of it can be seen at the end of our video as well and we would be happy to provide the assembled system for review.
